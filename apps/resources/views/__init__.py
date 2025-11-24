@@ -1,0 +1,1 @@
+from .resource_list_view import ResourceListView
