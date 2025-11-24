@@ -34,3 +34,19 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+### Testing
+
+Run tests with:
+
+``` bash
+python manage.py test
+```
+
+### Load seeds
+
+Load sample data with:
+
+```bash
+python -m seed.seed_resources
+```
