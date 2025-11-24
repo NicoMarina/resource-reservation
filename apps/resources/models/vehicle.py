@@ -9,4 +9,8 @@ class Vehicle(Resource):
     - Day-based reservations
     """
 
-    pass
+    def get_type(self):
+        return "vehicle"
+
+    def get_attributes(self):
+        return {}

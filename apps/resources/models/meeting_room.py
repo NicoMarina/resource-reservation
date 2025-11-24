@@ -11,3 +11,9 @@ class MeetingRoom(Resource):
     """
 
     capacity = models.IntegerField()
+
+    def get_type(self):
+        return "meeting_room"
+
+    def get_attributes(self):
+        return {"capacity": self.capacity}

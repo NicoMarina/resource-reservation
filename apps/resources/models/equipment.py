@@ -9,4 +9,8 @@ class Equipment(Resource):
     - Hour-based or day-based reservations
     """
 
-    pass
+    def get_type(self):
+        return "equipment"
+
+    def get_attributes(self):
+        return {}
