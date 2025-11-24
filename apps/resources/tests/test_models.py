@@ -1,4 +1,4 @@
-from .tests import ResourceTestSetup
+from .conftest import ResourceTestSetup
 
 
 class ResourceModelTest(ResourceTestSetup):
