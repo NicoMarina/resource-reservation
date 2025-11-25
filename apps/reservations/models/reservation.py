@@ -7,10 +7,10 @@ class Reservation(models.Model):
 
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
     date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
     full_day = models.BooleanField(default=False)
-    used_capacity = models.PositiveIntegerField(default=1)
+    used_capacity = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ("date", "start_time")

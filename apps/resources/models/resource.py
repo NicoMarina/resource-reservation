@@ -32,11 +32,21 @@ class Resource(PolymorphicModel):
         """Return True if the resource allows shared capacity bookings."""
         return False
 
-    def get_max_capacity(self):
-        """Return the maximum capacity of the resource."""
-        raise NotImplementedError
-
-    def check_availability(self, date, start_time=None, end_time=None):
+    def check_availability(
+        self, date, start_time=None, end_time=None, used_capacity=None
+    ):
         """Check if the resource is available for the given date and time."""
         raise NotImplementedError
 
+    def create_reservation(
+        self, date, start_time=None, end_time=None, used_capacity=None
+    ):
+        from apps.reservations.models import Reservation
+
+        return Reservation.objects.create(
+            resource=self,
+            date=date,
+            start_time=start_time if self.is_hourly() else None,
+            end_time=end_time if self.is_hourly() else None,
+            used_capacity=used_capacity if self.allow_shared_capacity() else None,
+        )

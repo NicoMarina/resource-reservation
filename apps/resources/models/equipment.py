@@ -24,7 +24,9 @@ class Equipment(Resource):
     def is_daily(self):
         return True
 
-    def check_availability(self, date, start_time=None, end_time=None):
+    def check_availability(
+        self, date, start_time=None, end_time=None, used_capacity=None
+    ):
         start_time = start_time or time(8, 0)
         end_time = end_time or time(20, 0)
 

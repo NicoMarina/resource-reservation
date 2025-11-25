@@ -28,17 +28,37 @@ class MeetingRoom(Resource):
     def allow_shared_capacity(self):
         return True
 
-    def check_availability(self, date, start_time=None, end_time=None):
+    def check_availability(
+        self, date, start_time=None, end_time=None, used_capacity=None
+    ):
         start_time = start_time or time(8, 0)
         end_time = end_time or time(20, 0)
+
+        # Convertir used_capacity a int si viene como string
+        if used_capacity is None:
+            used_capacity = 1
+        elif isinstance(used_capacity, str):
+            used_capacity = int(used_capacity)
+
+        # Validar horario de oficina
+        office_start, office_end = time(8, 0), time(20, 0)
+        if start_time < office_start or end_time > office_end:
+            return {
+                "resource_id": self.id,
+                "available": False,
+                "capacity_total": self.capacity,
+                "capacity_used": 0,
+                "capacity_remaining": self.capacity,
+                "free_hours": [],
+                "blocking_reservations": [],
+                "reason": "Outside office hours",
+            }
 
         # Filtrar reservas del día
         reservations = Reservation.objects.filter(resource=self, date=date)
 
         # Franjas libres
-        free_hours = calculate_free_hours(reservations, start_time, end_time)
-
-        # Capacidad en cada franja
+        free_hours = calculate_free_hours(reservations, time(8, 0), time(20, 0))
         for slot in free_hours:
             overlapping = [
                 r
@@ -59,15 +79,17 @@ class MeetingRoom(Resource):
             for r in reservations
             if overlaps(r.start_time, r.end_time, start_time, end_time)
         ]
-        used_capacity = sum(getattr(r, "used_capacity", 1) for r in requested_overlap)
-        remaining_capacity = self.capacity - used_capacity
+        used = sum(getattr(r, "used_capacity", 0) for r in requested_overlap)
+        remaining = self.capacity - used
+
+        available = remaining >= used_capacity
 
         return {
             "resource_id": self.id,
-            "available": remaining_capacity > 0,
+            "available": available,
             "capacity_total": self.capacity,
-            "capacity_used": used_capacity,
-            "capacity_remaining": remaining_capacity,
+            "capacity_used": used,
+            "capacity_remaining": remaining,
             "free_hours": free_hours,
             "blocking_reservations": [
                 {
@@ -78,5 +100,5 @@ class MeetingRoom(Resource):
                 }
                 for r in requested_overlap
             ],
-            "reason": None if remaining_capacity > 0 else "Capacity exceeded",
+            "reason": None if available else "Capacity exceeded",
         }

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "polymorphic",
     "apps.resources",
     "apps.reservations",
+    "apps.users",
 ]
 
 MIDDLEWARE = [
