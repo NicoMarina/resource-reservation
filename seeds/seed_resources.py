@@ -1,8 +1,7 @@
-# seed/seed_resources.py
 import os
 import django
 
-# Configura Django
+# Confihure Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "resource_reservation.settings")
 django.setup()
 
@@ -10,12 +9,12 @@ from apps.resources.models import MeetingRoom, Vehicle, Equipment
 
 
 def run():
-    # Limpiar datos existentes
+    # Clean up existing data
     MeetingRoom.objects.all().delete()
     Vehicle.objects.all().delete()
     Equipment.objects.all().delete()
 
-    # Crear meeting rooms
+    # Create meeting rooms
     MeetingRoom.objects.create(
         name="Conference Room A",
         description="A large conference room",
@@ -29,7 +28,7 @@ def run():
         image_url="http://example.com/meeting2.png",
     )
 
-    # Crear vehicles
+    # Create vehicles
     Vehicle.objects.create(
         name="Company Car",
         description="Car for business trips",
@@ -41,7 +40,7 @@ def run():
         image_url="http://example.com/van.png",
     )
 
-    # Crear equipments
+    # Create equipments
     Equipment.objects.create(
         name="Projector",
         description="HD Projector",
