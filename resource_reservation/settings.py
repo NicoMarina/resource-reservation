@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "polymorphic",
-    "drf_spectacular",
     "apps.resources",
     "apps.reservations",
 ]
@@ -125,20 +124,3 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# SWAGGER / DRF SPECTACULAR SETTINGS
-REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "API",
-    "DESCRIPTION": "Resource Reservation System",
-    "VERSION": "v1",
-    "SERVE_INCLUDE_SCHEMA": False,
-    # Swagger UI
-    "SWAGGER_UI_SETTINGS": {
-        "filter": False,
-        "defaultModelsExpandDepth": -1,
-    },
-}
