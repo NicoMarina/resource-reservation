@@ -10,6 +10,6 @@ class ResourceListView(APIView):
     """
 
     def get(self, request):
-        resources = Resource.objects.all().order_by("name")
+        resources = Resource.objects.all().order_by("id")
         serializer = ResourceSerializer(resources, many=True)
         return Response(serializer.data)
