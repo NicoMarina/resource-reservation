@@ -66,7 +66,7 @@ This will create:
 
 ### 1. List All Resources
 
-Endpoint: GET /resources/
+GET /resources/
 
 Response Example:
 
@@ -93,7 +93,7 @@ Response Example:
 
 ### 2. Check Resource Availability
 
-Endpoint: GET /resources/{id}/availability/
+GET /resources/{id}/availability/
 
 Query Parameters (optional start_time and end_time):
 
@@ -133,12 +133,45 @@ Response Example:
 }
 ```
 
-- MeetingRoom: calculates capacity and free hourly slots.
-- Vehicle: available only if no full-day reservation exists.
-- Equipment: calculates free hours; can be booked by hour or full day.
+- MeetingRoom → shows hourly free slots and remaining capacity.
+- Vehicle → only available if no reservation exists for the day.
+- Equipment → shows hourly availability or full-day booking.
 
-### 3. Notes
+### 2. Create a Reservation
 
-- API supports query parameters (date, start_time, end_time) for testing and integration.
-- The sample seeds allow immediate testing of overlapping and partial reservations.
-- The system uses polymorphic models to simplify resource handling and avoid type-specific conditionals.
+POST /api/resources/{id}/reserve/
+
+Request body examples:
+
+MeetingRoom (hourly, shared capacity):
+
+```json
+{
+  "date": "2025-11-23",
+  "start_time": "11:00",
+  "end_time": "12:00",
+  "used_capacity": 5
+}
+```
+
+Vehicle (full day):
+
+```json
+{
+  "date": "2025-11-23",
+  "start_time": "11:00",
+  "end_time": "12:00",
+  "used_capacity": 5
+}
+```
+
+Equipment (hourly):
+
+```json
+{
+  "date": "2025-11-23",
+  "start_time": "11:00",
+  "end_time": "12:00",
+  "used_capacity": 5
+}
+```
