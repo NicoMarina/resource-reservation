@@ -3,6 +3,7 @@ from .views import (
     ResourceAvailabilityView,
     CreateReservationView,
     ApproveReservationView,
+    CancelReservationView,
 )
 
 urlpatterns = [
@@ -20,5 +21,10 @@ urlpatterns = [
         "reservations/<int:reservation_id>/approve/",
         ApproveReservationView.as_view(),
         name="reservation-approve",
+    ),
+    path(
+        "reservations/<int:reservation_id>/cancel/",
+        CancelReservationView.as_view(),
+        name="cancel-reservation",
     ),
 ]

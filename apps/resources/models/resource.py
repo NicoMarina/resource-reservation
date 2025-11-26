@@ -1,5 +1,6 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
+from .cancellation_policy import CancellationPolicy
 
 
 class Resource(PolymorphicModel):
@@ -11,6 +12,13 @@ class Resource(PolymorphicModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)
+    cancellation_policy = models.ForeignKey(
+        CancellationPolicy,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="resources",
+    )
 
     def get_type(self):
         """Return the type of the resource as a string."""

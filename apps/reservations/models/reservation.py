@@ -10,6 +10,7 @@ class Reservation(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending Approval"),
         ("approved", "Approved"),
+        ("cancelled", "Cancelled"),
     ]
 
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
@@ -31,6 +32,14 @@ class Reservation(models.Model):
         null=True,
         related_name="created_reservations",
     )
+    cancelled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cancelled_reservations",
+    )
+    cancelled_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     class Meta:
@@ -41,3 +50,6 @@ class Reservation(models.Model):
 
     def is_approved(self):
         return self.status == "approved"
+
+    def is_cancelled(self):
+        return self.status == "cancelled"
