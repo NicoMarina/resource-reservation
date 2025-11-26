@@ -48,6 +48,7 @@ python manage.py test
 Load sample data with:
 
 ```bash
+python -m seeds.seed_users
 python -m seeds.seed_resources
 python -m seeds.seed_reservations
 ```
@@ -61,6 +62,10 @@ This will create:
   - Partial day bookings
   - Full day bookings
   - Overlapping reservations
+- Sample users:
+  - Worker: worker1 / workerpass
+  - Manager: manager1 / managerpass
+- Token-based authentication for API testing.
 
 ## API Endpoints
 
@@ -129,6 +134,7 @@ Response Example:
             "used_capacity": 10
         }
     ],
+    "pending_reservations": [],
     "reason": null
 }
 ```
@@ -137,9 +143,9 @@ Response Example:
 - Vehicle → only available if no reservation exists for the day.
 - Equipment → shows hourly availability or full-day booking.
 
-### 2. Create a Reservation
+### 3. Create a Reservation
 
-POST /api/resources/{id}/reserve/
+POST /api/resources/{id}/reservations/
 
 Request body examples:
 
@@ -158,20 +164,45 @@ Vehicle (full day):
 
 ```json
 {
-  "date": "2025-11-23",
-  "start_time": "11:00",
-  "end_time": "12:00",
-  "used_capacity": 5
+  "date": "2025-11-23"
 }
 ```
 
-Equipment (hourly):
+Equipment (hourly or full day):
 
 ```json
 {
   "date": "2025-11-23",
   "start_time": "11:00",
-  "end_time": "12:00",
-  "used_capacity": 5
+  "end_time": "12:00"
 }
 ```
+
+Notes:
+
+- Validation is based on availability and resource type.
+- Pending reservations are created if the user role cannot auto-approve.
+- Response includes the created reservation or ValidationError with reason and conflicting reservations.
+
+Authentication: All requests require token-based authentication. Include in header
+
+```text
+Authorization: Token <USER_TOKEN>
+```
+
+### 4. User Testing & Roles
+
+Sample users created via seeds:
+
+| Role    | Username | Password    | Token (example)   |
+| ------- | -------- | ----------- | ----------------- |
+| Worker  | worker1  | workerpass  | `<WORKER_TOKEN>`  |
+| Manager | manager1 | managerpass | `<MANAGER_TOKEN>` |
+
+- In Postman, define environment variables for WORKER_TOKEN and MANAGER_TOKEN and use {{WORKER_TOKEN}} in the Authorization header. This way, you only need to change the value once for the collection.
+- Ensures that scenarios like overlapping reservations or capacity limits can be tested consistently.
+
+### 5. Postman Testing
+
+- Import the included Postman collection to test all scenarios.
+- Use environment variables for tokens to simplify role switching.

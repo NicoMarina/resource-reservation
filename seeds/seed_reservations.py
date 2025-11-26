@@ -8,11 +8,16 @@ django.setup()
 
 from apps.resources.models import MeetingRoom, Vehicle, Equipment
 from apps.reservations.models import Reservation
+from django.contrib.auth.models import User
 
 
 def run():
     # Clean up existing data
     Reservation.objects.all().delete()
+
+    # Get users
+    worker = User.objects.get(username="worker1")
+    manager = User.objects.get(username="manager1")
 
     # Get resources
     rooms = MeetingRoom.objects.all()
@@ -31,6 +36,9 @@ def run():
         start_time=time(9, 0),
         end_time=time(11, 0),
         used_capacity=10,
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=room_a,
@@ -38,6 +46,9 @@ def run():
         start_time=time(14, 0),
         end_time=time(16, 0),
         used_capacity=20,
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=room_a,
@@ -45,6 +56,8 @@ def run():
         start_time=time(15, 0),
         end_time=time(16, 0),
         used_capacity=10,
+        status="pending",
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=room_a,
@@ -52,6 +65,9 @@ def run():
         start_time=time(9, 0),
         end_time=time(10, 0),
         used_capacity=1,
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=room_a,
@@ -59,6 +75,8 @@ def run():
         start_time=time(9, 0),
         end_time=time(12, 0),
         used_capacity=10,
+        status="pending",
+        created_by=worker,
     )
 
     # Room B
@@ -68,6 +86,9 @@ def run():
         start_time=time(10, 0),
         end_time=time(12, 0),
         used_capacity=5,
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=room_b,
@@ -75,20 +96,23 @@ def run():
         start_time=time(13, 0),
         end_time=time(15, 0),
         used_capacity=10,
+        status="pending",
+        created_by=worker,
     )
 
     # Create vehicle reservations
     Reservation.objects.create(
         resource=vehicle_a,
         date=datetime(2025, 11, 23, tzinfo=timezone.utc).date(),
-        start_time=time(0, 0),
-        end_time=time(23, 59),
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=vehicle_b,
         date=datetime(2025, 11, 24, tzinfo=timezone.utc).date(),
-        start_time=time(0, 0),
-        end_time=time(23, 59),
+        status="pending",
+        created_by=worker,
     )
 
     # Equipment reservations
@@ -98,30 +122,42 @@ def run():
         date=datetime(2025, 11, 23, tzinfo=timezone.utc).date(),
         start_time=time(10, 0),
         end_time=time(12, 0),
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=projector,
         date=datetime(2025, 11, 23, tzinfo=timezone.utc).date(),
         start_time=time(15, 0),
         end_time=time(18, 0),
+        status="pending",
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=projector,
         date=datetime(2025, 11, 24, tzinfo=timezone.utc).date(),
         start_time=time(10, 0),
         end_time=time(12, 0),
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=projector,
         date=datetime(2025, 11, 24, tzinfo=timezone.utc).date(),
         start_time=time(14, 0),
         end_time=time(16, 0),
+        status="pending",
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=projector,
         date=datetime(2025, 11, 26, tzinfo=timezone.utc).date(),
         start_time=time(8, 0),
         end_time=time(20, 0),
+        status="pending",
+        created_by=worker,
     )
 
     # Whiteboard
@@ -130,27 +166,37 @@ def run():
         date=datetime(2025, 11, 23, tzinfo=timezone.utc).date(),
         start_time=time(9, 0),
         end_time=time(11, 0),
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=whiteboard,
         date=datetime(2025, 11, 24, tzinfo=timezone.utc).date(),
         start_time=time(13, 0),
         end_time=time(15, 0),
+        status="pending",
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=whiteboard,
         date=datetime(2025, 11, 25, tzinfo=timezone.utc).date(),
         start_time=time(10, 0),
         end_time=time(12, 0),
+        status="approved",
+        approved_by=manager,
+        created_by=worker,
     )
     Reservation.objects.create(
         resource=whiteboard,
         date=datetime(2025, 11, 26, tzinfo=timezone.utc).date(),
         start_time=time(14, 0),
         end_time=time(18, 0),
+        status="pending",
+        created_by=worker,
     )
 
-    print("Resources seeded successfully!")
+    print("Reservations seeded successfully!")
 
 
 if __name__ == "__main__":
