@@ -1,2 +1,3 @@
 from .check_availability_view import ResourceAvailabilityView
 from .create_reservation_view import CreateReservationView
+from .approve_reservation_view import ApproveReservationView
