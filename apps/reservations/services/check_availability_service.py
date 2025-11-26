@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from apps.resources.models import Resource
-from .datetime_utils import normalize_reservation_inputs
+from apps.common.utils import normalize_reservation_inputs
 
 
 class CheckAvailabilityService:

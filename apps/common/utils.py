@@ -1,6 +1,5 @@
 from datetime import datetime, time
 
-
 def normalize_reservation_inputs(date_str, start_time=None, end_time=None):
     """Convert strings to date and time objects, assigning default values if missing."""
     date = datetime.strptime(date_str, "%Y-%m-%d").date()

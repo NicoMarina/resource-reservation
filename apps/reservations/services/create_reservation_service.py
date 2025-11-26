@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from apps.resources.models import Resource
 from ..models import Reservation
-from .datetime_utils import normalize_reservation_inputs
+from apps.common.utils import normalize_reservation_inputs
 from .reservation_role_resolver import RoleChecker, ReservationStatusResolver
 
 
