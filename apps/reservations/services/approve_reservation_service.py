@@ -1,6 +1,6 @@
 from rest_framework.exceptions import PermissionDenied, NotFound
 from apps.reservations.models import Reservation
-from .reservation_policy import RoleChecker
+from .reservation_role_resolver import RoleChecker
 
 
 class ApproveReservationService:

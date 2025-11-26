@@ -1,6 +1,6 @@
 from .check_availability_service import CheckAvailabilityService
 from .create_reservation_service import CreateReservationService
-from .reservation_policy import RoleChecker, ReservationStatusResolver
+from .reservation_role_resolver import RoleChecker, ReservationStatusResolver
 from .availability_utils import (
     overlaps,
     calculate_free_hours,

@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from apps.resources.models import Resource
 from ..models import Reservation
 from .datetime_utils import normalize_reservation_inputs
-from .reservation_policy import RoleChecker, ReservationStatusResolver
+from .reservation_role_resolver import RoleChecker, ReservationStatusResolver
 
 
 class CreateReservationService:
