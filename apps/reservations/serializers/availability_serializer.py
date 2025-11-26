@@ -13,4 +13,7 @@ class AvailabilitySerializer(serializers.Serializer):
     blocking_reservations = serializers.ListField(
         child=serializers.DictField(), required=False
     )
+    pending_reservations = serializers.ListField(
+        child=serializers.DictField(), required=False
+    )
     reason = serializers.CharField(allow_null=True, required=False)
