@@ -39,8 +39,16 @@ class Resource(PolymorphicModel):
         raise NotImplementedError
 
     def create_reservation(
-        self, date, start_time=None, end_time=None, used_capacity=None
+        self,
+        date,
+        start_time=None,
+        end_time=None,
+        used_capacity=None,
+        status="pending",
+        approved_by=None,
+        created_by=None,
     ):
+        """Create a reservation for resources."""
         from apps.reservations.models import Reservation
 
         return Reservation.objects.create(
@@ -49,4 +57,7 @@ class Resource(PolymorphicModel):
             start_time=start_time if self.is_hourly() else None,
             end_time=end_time if self.is_hourly() else None,
             used_capacity=used_capacity if self.allow_shared_capacity() else None,
+            status=status,
+            approved_by=approved_by,
+            created_by=created_by,
         )
