@@ -1,5 +1,9 @@
 from django.urls import path
-from .views import ResourceAvailabilityView, CreateReservationView
+from .views import (
+    ResourceAvailabilityView,
+    CreateReservationView,
+    ApproveReservationView,
+)
 
 urlpatterns = [
     path(
@@ -8,8 +12,13 @@ urlpatterns = [
         name="resource-availability",
     ),
     path(
-        "resources/<int:resource_id>/reserve/",
+        "resources/<int:resource_id>/reservations/",
         CreateReservationView.as_view(),
-        name="resource-reserve",
+        name="resource-reservations",
+    ),
+    path(
+        "reservations/<int:reservation_id>/approve/",
+        ApproveReservationView.as_view(),
+        name="reservation-approve",
     ),
 ]
