@@ -1,7 +1,11 @@
 from django.db import models
 from .resource import Resource
 from apps.reservations.models.reservation import Reservation
-from apps.reservations.services.availability_utils import overlaps, calculate_free_hours
+from apps.reservations.services import (
+    calculate_free_hours,
+    serialize_blocking_reservations,
+    get_reservations_info,
+)
 from datetime import datetime, timedelta, time
 
 
@@ -30,34 +34,18 @@ class Equipment(Resource):
         start_time = start_time or time(8, 0)
         end_time = end_time or time(20, 0)
 
-        # Filtrar reservas del día
         reservations = Reservation.objects.filter(resource=self, date=date)
-
-        # Franjas libres (solo para visualización)
         free_hours = calculate_free_hours(reservations, start_time, end_time)
-        for slot in free_hours:
-            slot["start"] = slot["start"].strftime("%H:%M")
-            slot["end"] = slot["end"].strftime("%H:%M")
+        reservations_info = get_reservations_info(
+            reservations, self, start_time, end_time
+        )
 
-        # Comprobar si el slot solicitado está libre
-        requested_overlap = [
-            r
-            for r in reservations
-            if overlaps(r.start_time, r.end_time, start_time, end_time)
-        ]
-        available = len(requested_overlap) == 0
+        available = len(reservations_info["blocking_reservations"]) == 0
 
         return {
             "resource_id": self.id,
             "available": available,
             "free_hours": free_hours,
-            "blocking_reservations": [
-                {
-                    "id": r.id,
-                    "start_time": r.start_time.strftime("%H:%M"),
-                    "end_time": r.end_time.strftime("%H:%M"),
-                }
-                for r in requested_overlap
-            ],
+            **reservations_info,
             "reason": None if available else "Time slot already booked",
         }

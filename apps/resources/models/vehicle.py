@@ -1,6 +1,9 @@
 from django.db import models
 from .resource import Resource
 from apps.reservations.models.reservation import Reservation
+from apps.reservations.services import (
+    get_reservations_info,
+)
 
 
 class Vehicle(Resource):
@@ -30,14 +33,12 @@ class Vehicle(Resource):
         Ignores start_time/end_time since vehicle is daily.
         """
         reservations = Reservation.objects.filter(resource=self, date=date)
-
-        available = len(reservations) == 0
+        reservations_info = get_reservations_info(reservations, self)
+        available = len(reservations_info["blocking_reservations"]) == 0
 
         return {
             "resource_id": self.id,
             "available": available,
-            "blocking_reservations": [
-                {"id": r.id, "date": r.date.isoformat()} for r in reservations
-            ],
+            **reservations_info,
             "reason": None if available else "Vehicle already booked",
         }
