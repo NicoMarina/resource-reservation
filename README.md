@@ -2,15 +2,14 @@
 
 ## Description
 
-This project is a backend application to manage reservations of business resources:
+This project is a backend application to manage reservations of business resources such as meeting rooms, vehicles, and equipment.
 
-- Meeting rooms
-- Vehicles
-- Equipment
+This backend provides a structured reservation workflow with role-based permissions, capacity handling, and cancellation policies. It includes business logic for hourly and full-day reservations depending on resource type.
 
 It implements a REST API using Django and Django REST Framework.
 
-## Installation
+
+## Installation & Setup
 
 1. Clone the repository:
 
@@ -19,7 +18,7 @@ git clone https://github.com/NicoMarina/resource-reservation.git
 cd resource-reservation
 ```
 
-2. Set Up Virtual Environment
+2. Set Up Virtual Environment:
 
 ```bash
 sudo apt update
@@ -28,24 +27,49 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-3. Install Dependencies
+### Option 1: Automated Setup with Script
+
+Make the setup script executable (only once):
+
+```bash
+chmod +x script/setup.sh
+```
+
+Run the script:
+
+```bash
+./script/setup.sh
+```
+
+This script will:
+
+- Activate the virtual environment.
+- Install all dependencies.
+- Apply migrations (including auth tokens).
+- Run all tests.
+- Load sample data (users, resources, reservations).
+- Start the Django development server.
+
+Setup script provides full automation for testing and development environment.
+
+### Option 2: Manual Setup
+
+1. Install Dependencies:
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Testing
+2. Apply migrations:
 
-Run tests with:
-
-``` bash
-python manage.py test
+```bash
+python manage.py makemigrations
+python manage.py migrate authtoken
+python manage.py migrate
 ```
 
-### Load seeds
-
-Load sample data with:
+3. Load sample data:
 
 ```bash
 python -m seeds.seed_users
@@ -53,156 +77,104 @@ python -m seeds.seed_resources
 python -m seeds.seed_reservations
 ```
 
-This will create:
+4. Run tests:
 
-- Meeting Rooms: Room A, Room B
-- Vehicles: Vehicle A, Vehicle B
-- Equipment: Projector, Whiteboard
-- Sample reservations covering:
-  - Partial day bookings
-  - Full day bookings
-  - Overlapping reservations
-- Sample users:
-  - Worker: worker1 / workerpass
-  - Manager: manager1 / managerpass
-- Token-based authentication for API testing.
+``` bash
+python manage.py test
+```
+
+5. Start the development server:
+
+``` bash
+python manage.py runserver
+```
 
 ## API Endpoints
 
 ### 1. List All Resources
 
-GET /resources/
+`GET /api/resources/`
 
-Response Example:
-
-```json
-[
-    {
-        "id": 1,
-        "name": "Room A",
-        "description": "Main meeting room",
-        "type": "meeting_room",
-        "attributes": {"capacity": 20},
-        "image_url": "http://example.com/room_a.png"
-    },
-    {
-        "id": 2,
-        "name": "Vehicle A",
-        "description": "Company car",
-        "type": "vehicle",
-        "attributes": {},
-        "image_url": "http://example.com/vehicle_a.png"
-    }
-]
-```
+Lists all resources with attributes, type, and image URLs.
 
 ### 2. Check Resource Availability
 
-GET /resources/{id}/availability/
+`GET /api/resources/{id}/availability/`
 
-Query Parameters (optional start_time and end_time):
+Query parameters:
 
-- date: required, format YYYY-MM-DD
-- start_time: optional, format HH:MM
-- end_time: optional, format HH:MM
+- date (required, YYYY-MM-DD)
+- start_time, end_time (optional, HH:MM)
 
-Example Call (cURL):
-
-```bash
-curl "http://localhost:8000/resources/1/availability/?date=2025-11-23&start_time=10:00&end_time=12:00"
-```
-
-Response Example:
-
-```json
-{
-    "resource_id": 1,
-    "available": true,
-    "capacity_total": 20,
-    "capacity_used": 10,
-    "capacity_remaining": 10,
-    "free_hours": [
-        {"start": "08:00", "end": "10:00"},
-        {"start": "12:00", "end": "14:00"},
-        {"start": "16:00", "end": "20:00"}
-    ],
-    "blocking_reservations": [
-        {
-            "id": 3,
-            "start_time": "10:00",
-            "end_time": "12:00",
-            "used_capacity": 10
-        }
-    ],
-    "pending_reservations": [],
-    "reason": null
-}
-```
-
-- MeetingRoom → shows hourly free slots and remaining capacity.
-- Vehicle → only available if no reservation exists for the day.
-- Equipment → shows hourly availability or full-day booking.
+Returns availability, free slots, capacity used/remaining, and overlapping or pending reservations.
 
 ### 3. Create a Reservation
 
-POST /api/resources/{id}/reservations/
+`POST /api/resources/{id}/reservations/`
 
-Request body examples:
+Request body varies by resource type:
 
-MeetingRoom (hourly, shared capacity):
+- MeetingRoom: hourly, shared capacity
+- Vehicle: full-day
+- Equipment: hourly or full-day
 
-```json
-{
-  "date": "2025-11-23",
-  "start_time": "11:00",
-  "end_time": "12:00",
-  "used_capacity": 5
-}
+Pending reservations are created if the user role cannot auto-approve.
+
+### 4. Approve Pending Reservation
+
+`POST /api/reservations/{id}/approve/`
+
+- Only managers can approve.
+- Worker attempts → PermissionDenied
+
+### 5. Cancel a Reservation
+
+`POST /api/reservations/{id}/cancel/`
+
+- Response includes cancelled ID and transferred_to ID (if any).
+- Blocked, Moderate, Flexible policies are handled according to the resource’s policy.
+
+## Testing
+
+### 1. Django Unit & Integration Tests
+
+```bash
+python manage.py test
 ```
 
-Vehicle (full day):
+- Unit tests: cover reservation logic, availability checks, capacity, and policy validation.
+- Integration tests: validate interaction between components.
 
-```json
-{
-  "date": "2025-11-23"
-}
-```
+### 2. Postman API Tests
 
-Equipment (hourly or full day):
+Import the Postman collection included in `docs/Resource_Reservation_API.postman_collection.json` to test all endpoints.
 
-```json
-{
-  "date": "2025-11-23",
-  "start_time": "11:00",
-  "end_time": "12:00"
-}
-```
+**Environment variables included:**
 
-Notes:
+- `BASE_URL` → e.g., `http://localhost:8000`
+- `WORKER_TOKEN` and `MANAGER_TOKEN` → pre-generated by seeds for easy role switching
 
-- Validation is based on availability and resource type.
-- Pending reservations are created if the user role cannot auto-approve.
-- Response includes the created reservation or ValidationError with reason and conflicting reservations.
+**Covered Scenarios:**
 
-Authentication: All requests require token-based authentication. Include in header
+- **Resources:** `GET /api/resources/` → list all resources  
+- **Availability:** check specific resources and time ranges (hourly/full-day, overlapping)
+- **Create Reservations:** worker and manager reservations, capacity exceeded, time overlap
+- **Approve Reservations:** worker attempts (fail), manager approves pending, manager invalid approvals
+- **Cancel Reservations:** manager cancels approved (triggers pending transfer), worker cancels, blocked/moderate policies
 
-```text
-Authorization: Token <USER_TOKEN>
-```
+Tokens are already created and imported; using the Postman environment allows simple role switching.
 
-### 4. User Testing & Roles
+---
 
-Sample users created via seeds:
+### Sample Data (Seeds)
 
-| Role    | Username | Password    | Token (example)   |
-| ------- | -------- | ----------- | ----------------- |
-| Worker  | worker1  | workerpass  | `<WORKER_TOKEN>`  |
-| Manager | manager1 | managerpass | `<MANAGER_TOKEN>` |
+Sample data created via seeds includes:
 
-- In Postman, define environment variables for WORKER_TOKEN and MANAGER_TOKEN and use {{WORKER_TOKEN}} in the Authorization header. This way, you only need to change the value once for the collection.
-- Ensures that scenarios like overlapping reservations or capacity limits can be tested consistently.
+- Users: Worker and Manager
+- Resources: Rooms, Vehicles, Equipment
+- Reservations: Partial-day, full-day, overlapping scenarios
+- Policies: Flexible, Moderate, Blocked
 
-### 5. Postman Testing
+## Architecture Documentation
 
-- Import the included Postman collection to test all scenarios.
-- Use environment variables for tokens to simplify role switching.
+A detailed architecture overview and the technical decisions behind this implementation are available in [architecture.md](docs/architecture.md).
