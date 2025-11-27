@@ -164,8 +164,6 @@ Import the Postman collection included in `docs/Resource_Reservation_API.postman
 
 Tokens are already created and imported; using the Postman environment allows simple role switching.
 
----
-
 ### Sample Data (Seeds)
 
 Sample data created via seeds includes:
