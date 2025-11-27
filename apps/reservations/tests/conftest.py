@@ -4,6 +4,8 @@ from ..models import Reservation
 from ..services import CheckAvailabilityService, CreateReservationService
 from datetime import datetime, time, timezone
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
+
 
 User = get_user_model()
 
@@ -21,6 +23,13 @@ class ReservationTestSetup(ResourceTestSetup):
             username="manager", password="password123"
         )
         cls.manager.groups.create(name="manager")
+
+        cls.worker_token, _ = Token.objects.update_or_create(
+            user=cls.user, defaults={"key": "WORKER_TEST_TOKEN_12345"}
+        )
+        cls.manager_token, _ = Token.objects.update_or_create(
+            user=cls.manager, defaults={"key": "MANAGER_TEST_TOKEN_12345"}
+        )
 
         # MeetingRoom reservations
         cls.room_res1 = Reservation.objects.create(
